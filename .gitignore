@@ -1,0 +1,27 @@
+# ENV file
+.env
+
+# Dependency directories
+node_modules/
+
+# Build outputs
+dist/
+dist-ssr/
+
+# Editor directories and files
+.vscode/
+.idea/
+.DS_Store
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# System files
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
