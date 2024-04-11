@@ -1,10 +1,9 @@
 const express = require('express');
-const getTaxonData = require('./queries/query1');
+const getTaxonData = require('../queries/query1.js');
+const router = express.Router(); // Create a router instance
 
-const app = express();
-const port = process.env.PORT || 3000;
-
-app.get('/api/taxon', async (req, res) => {
+// Define route handler for '/taxon' endpoint
+router.get('/api/taxon', async (req, res) => {
   try {
     console.log(
       'attempting to connect to the database and fetch taxon data...'
@@ -18,6 +17,4 @@ app.get('/api/taxon', async (req, res) => {
   }
 });
 
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
-});
+module.exports = router; // Export the router

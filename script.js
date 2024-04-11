@@ -1,7 +1,11 @@
+const express = require('express');
+const cors = require('cors');
 require('dotenv').config();
 const oracledb = require('oracledb');
-
 oracledb.outFormat = oracledb.OUT_FORMAT_OBJECT;
+
+const app = express();
+const port = 3000;
 
 async function run() {
   let connection;
@@ -26,16 +30,16 @@ async function run() {
     console.log('All Tables in the ITIS-database:', result);
   } catch (err) {
     console.error('Error during database operation:', err);
-  } finally {
-    if (connection) {
-      try {
-        await connection.close();
-        console.log('Closed the database connection.');
-      } catch (err) {
-        console.error('Error closing the database connection:', err);
-      }
-    }
-  }
+  // } finally {
+  //   if (connection) {
+  //     try {
+  //      // await connection.close();
+  //       console.log('Closed the database connection.');
+  //     } catch (err) {
+  //       console.error('Error closing the database connection:', err);
+  //     }
+  //   }
+   }
 }
 
-run();
+module.exports = run;

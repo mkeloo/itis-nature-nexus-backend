@@ -11,7 +11,10 @@ async function getTaxonData() {
       connectString: process.env.ORACLE_DB_CONNECTION_STRING,
     });
 
-    result = await connection.execute(`SELECT * FROM Taxon`);
+    result = await connection.execute(`SELECT * FROM gdppercapita WHERE ROWNUM <= 10`);
+    
+    console.log('HEY UR RESULT IS HERE', result); // Add this log statement
+
   } catch (error) {
     console.error(error);
     throw error;
@@ -24,7 +27,6 @@ async function getTaxonData() {
       }
     }
   }
-
   return result ? result.rows : null;
 }
 
