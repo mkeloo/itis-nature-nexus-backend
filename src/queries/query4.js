@@ -11,18 +11,20 @@ async function getPopulationDynamics() {
     const sql = `
             WITH annual_data AS (
                 SELECT
-                    stateProvince,
-                    EXTRACT(YEAR FROM TO_DATE(eventDate, 'YYYY-MM-DD')) AS year,
-                    scientificName,
-                    iucnRedListCategory,
+                    og.stateProvince,
+                    ot.year,
+                    bd.scientificName,
+                    bd.iucnRedListCategory,
                     COUNT(*) AS observation_count
                 FROM
-                    bird_observations
+                    observation_temporal ot
+                    JOIN observation_geospatial og ON ot.gbifID = og.gbifID
+                    JOIN bird_details bd ON ot.gbifID = bd.gbifID
                 GROUP BY
-                    stateProvince,
-                    EXTRACT(YEAR FROM TO_DATE(eventDate, 'YYYY-MM-DD')),
-                    scientificName,
-                    iucnRedListCategory
+                    og.stateProvince,
+                    ot.year,
+                    bd.scientificName,
+                    bd.iucnRedListCategory
             ),
             biodiversity_index AS (
                 SELECT
@@ -80,8 +82,7 @@ async function getPopulationDynamics() {
                 JOIN growth_rates c ON a.stateProvince = c.stateProvince AND a.year = c.year
                 JOIN conservation_trends d ON a.stateProvince = d.stateProvince AND a.year = d.year AND d.rank = 1
             ORDER BY
-                a.stateProvince,
-                a.year;
+                a.stateProvince, a.year;
         `;
     const result = await connection.execute(sql, [], {
       outFormat: oracledb.OUT_FORMAT_OBJECT,

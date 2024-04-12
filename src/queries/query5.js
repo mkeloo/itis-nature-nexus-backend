@@ -11,23 +11,22 @@ async function getRegionalTaxonomicDiversity() {
     const sql = `
             WITH RegionTaxonomy AS (
                 SELECT
-                    ol.StateProvince,
-                    ti.Family,
-                    ti.Genus,
-                    COUNT(DISTINCT cs.ScientificName) AS NumberOfSpecies,
-                    COUNT(DISTINCT CASE WHEN cs.IUCNRedListCategory IN ('VU', 'EN', 'CR') THEN cs.ScientificName END) AS ThreatenedSpecies
+                    og.stateProvince,
+                    bd.family,
+                    bd.genus,
+                    COUNT(DISTINCT bd.scientificName) AS NumberOfSpecies,
+                    COUNT(DISTINCT CASE WHEN bd.iucnRedListCategory IN ('VU', 'EN', 'CR') THEN bd.scientificName END) AS ThreatenedSpecies
                 FROM
-                    ObservationLocations ol
-                    JOIN TaxonomicInformation ti ON ol.ObservationID = ti.ObservationID
-                    JOIN ConservationStatus cs ON ti.ScientificName = cs.ScientificName
+                    observation_geospatial og
+                    JOIN bird_details bd ON og.gbifID = bd.gbifID
                 GROUP BY
-                    ol.StateProvince, ti.Family, ti.Genus
+                    og.stateProvince, bd.family, bd.genus
             ),
             ConservationFocus AS (
                 SELECT
-                    StateProvince,
-                    Family,
-                    Genus,
+                    stateProvince,
+                    family,
+                    genus,
                     NumberOfSpecies,
                     ThreatenedSpecies,
                     (CAST(ThreatenedSpecies AS FLOAT) / NumberOfSpecies) * 100 AS ThreatenedPercentage
@@ -35,9 +34,9 @@ async function getRegionalTaxonomicDiversity() {
                     RegionTaxonomy
             )
             SELECT
-                StateProvince,
-                Family,
-                Genus,
+                stateProvince,
+                family,
+                genus,
                 NumberOfSpecies,
                 ThreatenedSpecies,
                 ROUND(ThreatenedPercentage, 2) AS ThreatenedPercentage

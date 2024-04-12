@@ -9,35 +9,36 @@ async function getGrowthRates() {
   try {
     connection = await oracledb.getConnection(dbConfig);
     const sql = `
-            WITH yearly_observations AS (
+          WITH yearly_observations AS (
               SELECT
-                scientificName,
-                EXTRACT(YEAR FROM eventDate) AS year,
-                COUNT(*) AS observation_count
+                  bd.scientificName,
+                  ot.year,
+                  COUNT(*) AS observation_count
               FROM
-                bird_observations
+                  observation_temporal ot
+                  JOIN bird_details bd ON ot.gbifID = bd.gbifID
               GROUP BY
-                scientificName, EXTRACT(YEAR FROM eventDate)
-            ),
-            growth_rates AS (
+                  bd.scientificName, ot.year
+          ),
+          growth_rates AS (
               SELECT
-                scientificName,
-                year,
-                observation_count,
-                (observation_count - LAG(observation_count) OVER (PARTITION BY scientificName ORDER BY year)) / LAG(observation_count) OVER (PARTITION BY scientificName ORDER BY year) AS growth_rate
+                  scientificName,
+                  year,
+                  observation_count,
+                  (observation_count - LAG(observation_count) OVER (PARTITION BY scientificName ORDER BY year)) / LAG(observation_count) OVER (PARTITION BY scientificName ORDER BY year) AS growth_rate
               FROM
-                yearly_observations
-            )
-            SELECT
+                  yearly_observations
+          )
+          SELECT
               scientificName,
               year,
               observation_count,
               ROUND(growth_rate * 100, 2) AS growth_rate_percentage
-            FROM
+          FROM
               growth_rates
-            WHERE
+          WHERE
               growth_rate IS NOT NULL
-            ORDER BY
+          ORDER BY
               scientificName, year;
         `;
     const result = await connection.execute(sql, [], {
