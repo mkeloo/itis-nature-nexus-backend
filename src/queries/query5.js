@@ -1,10 +1,12 @@
 const oracledb = require('oracledb');
 const { openConnection } = require('../../config/database');
 
-// 5. Regional Taxonomic Diversity and Conservation Priorities
-// File: getRegionalTaxonomicDiversity.js
-
-async function getRegionalTaxonomicDiversity() {
+async function getRegionalTaxonomicDiversity(
+  stateProvince,
+  family,
+  genus,
+  orderBy
+) {
   let connection;
   try {
     connection = await openConnection(); // Consistent connection handling
@@ -19,6 +21,10 @@ async function getRegionalTaxonomicDiversity() {
             FROM
                 observation_geospatial og
                 JOIN bird_details bd ON og.gbifID = bd.gbifID
+            WHERE
+                (:stateProvince IS NULL OR og.stateProvince = :stateProvince) AND
+                (:family IS NULL OR bd.family = :family) AND
+                (:genus IS NULL OR bd.genus = :genus)
             GROUP BY
                 og.stateProvince, bd.family, bd.genus
         ),
@@ -43,12 +49,19 @@ async function getRegionalTaxonomicDiversity() {
         FROM
             ConservationFocus
         ORDER BY
-            ThreatenedPercentage DESC, ThreatenedSpecies DESC
-        -- FETCH FIRST 10 ROWS ONLY
+            ${orderBy}  -- Ensure to validate orderBy to prevent SQL Injection
     `;
-    const result = await connection.execute(sql, [], {
-      outFormat: oracledb.OUT_FORMAT_OBJECT,
-    });
+    const result = await connection.execute(
+      sql,
+      {
+        stateProvince,
+        family,
+        genus,
+      },
+      {
+        outFormat: oracledb.OUT_FORMAT_OBJECT,
+      }
+    );
     return result.rows;
   } catch (err) {
     console.error('Error in getRegionalTaxonomicDiversity:', err);

@@ -1,66 +1,92 @@
 const oracledb = require('oracledb');
 const { openConnection } = require('../../config/database');
 
-// 3. Year-over-Year Growth Rate in Species Observations
-// File: getGrowthRates.js
-
-async function getGrowthRates() {
+async function getDynamicGrowthRates(
+  startYear,
+  endYear,
+  growthRateThreshold,
+  orderBy
+) {
   let connection;
   try {
-    connection = await openConnection(); // Use the consistent connection method
-    const sql = `
+    connection = await openConnection();
+    let sql = `
             WITH yearly_observations AS (
-              SELECT
-                bd.scientificName,  -- Selecting scientific name from bird_details
-                ot.year,            -- Year from observation_temporal
-                COUNT(*) AS observation_count  -- Count of observations per species per year
-              FROM
-                observation_temporal ot
-                JOIN bird_details bd ON ot.gbifID = bd.gbifID  -- Joining tables on gbifID
-              GROUP BY
-                bd.scientificName, ot.year
+                SELECT
+                    bd.scientificName,
+                    ot.year,
+                    COUNT(*) AS observation_count
+                FROM
+                    observation_temporal ot
+                    JOIN bird_details bd ON ot.gbifID = bd.gbifID
+                WHERE
+                    ot.year BETWEEN :startYear AND :endYear
+                GROUP BY
+                    bd.scientificName, ot.year
             ),
             growth_rates AS (
-              SELECT
-                yo.scientificName,
-                yo.year,
-                yo.observation_count,
-                (yo.observation_count - LAG(yo.observation_count) OVER (
-                  PARTITION BY yo.scientificName ORDER BY yo.year
-                )) / LAG(yo.observation_count) OVER (
-                  PARTITION BY yo.scientificName ORDER BY yo.year
-                ) AS growth_rate  -- Calculating growth rate using LAG to get previous year's count
-              FROM
-                yearly_observations yo
+                SELECT
+                    scientificName,
+                    year,
+                    observation_count,
+                    LAG(observation_count) OVER (PARTITION BY scientificName ORDER BY year) AS prev_year_count,
+                    (observation_count - LAG(observation_count) OVER (PARTITION BY scientificName ORDER BY year)) / LAG(observation_count) OVER (PARTITION BY scientificName ORDER BY year) AS growth_rate
+                FROM
+                    yearly_observations
+            ),
+            significant_changes AS (
+                SELECT
+                    scientificName,
+                    year,
+                    observation_count,
+                    prev_year_count,
+                    growth_rate,
+                    ROUND(growth_rate * 100, 2) AS growth_rate_percentage
+                FROM
+                    growth_rates
+                WHERE
+                    ABS(growth_rate) >= :growthRateThreshold
             )
             SELECT
-              scientificName,
-              year,
-              observation_count,
-              ROUND(growth_rate * 100, 2) AS growth_rate_percentage  -- Final selection, rounding growth rate
+                scientificName,
+                year,
+                observation_count,
+                prev_year_count,
+                growth_rate_percentage
             FROM
-              growth_rates
-            WHERE
-              growth_rate IS NOT NULL  -- Filtering out nulls to avoid incomplete data
+                significant_changes
             ORDER BY
-              scientificName, year  -- Ordering results
+                growth_rate_percentage ${
+                  orderBy === 'asc' ? 'ASC' : 'DESC'
+                }, scientificName, year
         `;
-    const result = await connection.execute(sql, [], {
-      outFormat: oracledb.OUT_FORMAT_OBJECT,
-    });
+    const result = await connection.execute(
+      sql,
+      {
+        startYear: startYear,
+        endYear: endYear,
+        growthRateThreshold: growthRateThreshold,
+      },
+      {
+        outFormat: oracledb.OUT_FORMAT_OBJECT,
+      }
+    );
     return result.rows;
   } catch (err) {
-    console.error('Error in getGrowthRates:', err);
+    console.error('Error in getDynamicGrowthRates:', err);
     throw err;
   } finally {
     if (connection) {
       try {
         await connection.close();
       } catch (err) {
-        console.error('Error closing connection in getGrowthRates:', err);
+        console.error(
+          'Error closing connection in getDynamicGrowthRates:',
+          err
+        );
       }
     }
   }
 }
 
-module.exports = getGrowthRates;
+module.exports = getDynamicGrowthRates;

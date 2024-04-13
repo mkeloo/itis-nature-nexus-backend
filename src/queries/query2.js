@@ -1,10 +1,7 @@
 const oracledb = require('oracledb');
 const { openConnection } = require('../../config/database');
 
-// 2. Diversity Index Calculation Across Years
-// File: getDiversityIndex.js
-
-async function getDiversityIndex() {
+async function getDiversityIndex(startYear, endYear) {
   let connection;
   try {
     connection = await openConnection();
@@ -17,6 +14,8 @@ async function getDiversityIndex() {
                 FROM
                     observation_temporal ot
                     JOIN bird_details bd ON ot.gbifID = bd.gbifID
+                WHERE
+                    ot.year BETWEEN :startYear AND :endYear
                 GROUP BY
                     ot.year, bd.scientificName
             ),
@@ -47,9 +46,13 @@ async function getDiversityIndex() {
             ORDER BY
                 year
         `;
-    const result = await connection.execute(sql, [], {
-      outFormat: oracledb.OUT_FORMAT_OBJECT,
-    });
+    const result = await connection.execute(
+      sql,
+      { startYear, endYear },
+      {
+        outFormat: oracledb.OUT_FORMAT_OBJECT,
+      }
+    );
     return result.rows;
   } catch (err) {
     console.error('Error in getDiversityIndex:', err);
