@@ -9,36 +9,35 @@ async function getGrowthRates() {
   try {
     connection = await oracledb.getConnection(dbConfig);
     const sql = `
-          WITH yearly_observations AS (
+            WITH yearly_observations AS (
               SELECT
-                  bd.scientificName,
-                  ot.year,
-                  COUNT(*) AS observation_count
+                scientificName,
+                year,
+                COUNT(*) AS observation_count
               FROM
-                  observation_temporal ot
-                  JOIN bird_details bd ON ot.gbifID = bd.gbifID
+                bird_observations
               GROUP BY
-                  bd.scientificName, ot.year
-          ),
-          growth_rates AS (
+                scientificName, year
+            ),
+            growth_rates AS (
               SELECT
-                  scientificName,
-                  year,
-                  observation_count,
-                  (observation_count - LAG(observation_count) OVER (PARTITION BY scientificName ORDER BY year)) / LAG(observation_count) OVER (PARTITION BY scientificName ORDER BY year) AS growth_rate
+                a.scientificName,
+                a.year,
+                a.observation_count,
+                (a.observation_count - LAG(a.observation_count) OVER (PARTITION BY a.scientificName ORDER BY a.year)) / LAG(a.observation_count) OVER (PARTITION BY a.scientificName ORDER BY a.year) AS growth_rate
               FROM
-                  yearly_observations
-          )
-          SELECT
+                yearly_observations a
+            )
+            SELECT
               scientificName,
               year,
               observation_count,
               ROUND(growth_rate * 100, 2) AS growth_rate_percentage
-          FROM
+            FROM
               growth_rates
-          WHERE
+            WHERE
               growth_rate IS NOT NULL
-          ORDER BY
+            ORDER BY
               scientificName, year;
         `;
     const result = await connection.execute(sql, [], {
