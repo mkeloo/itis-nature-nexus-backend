@@ -1,5 +1,5 @@
 const oracledb = require('oracledb');
-const dbConfig = require('../config/database');
+const { openConnection } = require('../../config/database');
 
 // 2. Diversity Index Calculation Across Years
 // File: getDiversityIndex.js
@@ -7,7 +7,7 @@ const dbConfig = require('../config/database');
 async function getDiversityIndex() {
   let connection;
   try {
-    connection = await oracledb.getConnection(dbConfig);
+    connection = await openConnection();
     const sql = `
             WITH yearly_data AS (
                 SELECT
@@ -45,20 +45,21 @@ async function getDiversityIndex() {
             FROM
                 biodiversity_scores
             ORDER BY
-                year;
+                year
         `;
     const result = await connection.execute(sql, [], {
       outFormat: oracledb.OUT_FORMAT_OBJECT,
     });
     return result.rows;
   } catch (err) {
+    console.error('Error in getDiversityIndex:', err);
     throw err;
   } finally {
     if (connection) {
       try {
         await connection.close();
       } catch (err) {
-        console.error(err);
+        console.error('Error closing connection in getDiversityIndex:', err);
       }
     }
   }

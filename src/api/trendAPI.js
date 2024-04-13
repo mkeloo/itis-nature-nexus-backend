@@ -2,24 +2,26 @@ const express = require('express');
 const router = express.Router();
 
 // Importing query functions from their respective files
-const getBirdObservationTrends = require('../queries/getBirdObservationTrends');
-const getDiversityIndex = require('../queries/getDiversityIndex');
-const getSpeciesGrowthRates = require('../queries/getSpeciesGrowthRates');
-const getPopulationDynamics = require('../queries/getPopulationDynamics');
-const getRegionalTaxonomicDiversity = require('../queries/getRegionalTaxonomicDiversity');
+const getBirdClimateCorrelation = require('../queries/query1');
+const getDiversityIndex = require('../queries/query2');
+const getSpeciesGrowthRates = require('../queries/query3');
+const getPopulationDynamics = require('../queries/query4');
+const getRegionalTaxonomicDiversity = require('../queries/query5');
 
-// Endpoint for bird observation and climate variation correlation trends
-router.get('/bird-observation-trends', async (req, res) => {
+// QUERY 1: Endpoint for bird observation and climate variation correlation
+router.get('/query1', async (req, res) => {
   try {
-    const data = await getBirdObservationTrends();
+    const data = await getBirdClimateCorrelation();
+    // console.log(data);
     res.json(data);
   } catch (error) {
+    // console.error(error);
     res.status(500).json({ error: error.message });
   }
 });
 
-// Endpoint for biodiversity index trends
-router.get('/diversity-index', async (req, res) => {
+// QUERY 2: Endpoint for biodiversity index trends
+router.get('/query2', async (req, res) => {
   try {
     const data = await getDiversityIndex();
     res.json(data);
@@ -28,8 +30,8 @@ router.get('/diversity-index', async (req, res) => {
   }
 });
 
-// Endpoint for species growth rate trends
-router.get('/species-growth-rates', async (req, res) => {
+// QUERY 3: Endpoint for species growth rate trends
+router.get('/query3', async (req, res) => {
   try {
     const data = await getSpeciesGrowthRates();
     res.json(data);
@@ -38,8 +40,8 @@ router.get('/species-growth-rates', async (req, res) => {
   }
 });
 
-// Endpoint for bird population dynamics trends
-router.get('/population-dynamics', async (req, res) => {
+// QUERY 4: Endpoint for bird population dynamics trends
+router.get('/query4', async (req, res) => {
   try {
     const data = await getPopulationDynamics();
     res.json(data);
@@ -48,8 +50,8 @@ router.get('/population-dynamics', async (req, res) => {
   }
 });
 
-// Endpoint for regional taxonomic diversity and conservation priorities
-router.get('/regional-taxonomic-diversity', async (req, res) => {
+// QUERY 5: Endpoint for regional taxonomic diversity and conservation priorities
+router.get('/query5', async (req, res) => {
   try {
     const data = await getRegionalTaxonomicDiversity();
     res.json(data);

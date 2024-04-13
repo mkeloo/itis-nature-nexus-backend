@@ -20,4 +20,7 @@ async function openConnection() {
   }
 }
 
-module.exports = { openConnection };
+module.exports = {
+  openConnection,
+  dbConfig,
+};

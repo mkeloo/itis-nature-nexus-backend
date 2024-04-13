@@ -1,5 +1,5 @@
 const oracledb = require('oracledb');
-const dbConfig = require('../config/database');
+const { openConnection } = require('../../config/database');
 
 // 1. Bird Observations and Climate Variations Correlation
 // File: getBirdClimateCorrelation.js
@@ -7,7 +7,8 @@ const dbConfig = require('../config/database');
 async function getBirdClimateCorrelation() {
   let connection;
   try {
-    connection = await oracledb.getConnection(dbConfig);
+    // Use the openConnection method to ensure proper configuration and handling
+    connection = await openConnection();
     const sql = `
             WITH bird_observations_summary AS (
                 SELECT
@@ -57,7 +58,7 @@ async function getBirdClimateCorrelation() {
             FROM
                 combined_analysis ca
             ORDER BY
-                ca.year, ca.stateProvince;
+                ca.year, ca.stateProvince
         `;
     const result = await connection.execute(sql, [], {
       outFormat: oracledb.OUT_FORMAT_OBJECT,
