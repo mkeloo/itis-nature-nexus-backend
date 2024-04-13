@@ -2,163 +2,62 @@
 
 Google Doc For 5 Complex Queries: [LINK:](https://docs.google.com/document/d/1C_6i9Mzdmzy1009HQfd19PyyQo_rHkEit9O_QogxLaE/edit?usp=sharing)
 
-## SQL Data Tables:
 
-## I. Observational Data
+## Steps to test the backend App:
 
-### 1. Temporal Observation Data Table:
-
+### 1. clone the repo:
 ```
-CREATE TABLE observation_temporal (
-    gbifID BIGINT PRIMARY KEY,
-    eventDate DATE,
-    year INT,
-    month INT,
-    day INT,
-    stateProvince VARCHAR(255)
-);
+git clone https://github.com/mkeloo/itis-nature-nexus-backend.git
+``` 
+
+### 2. Install Dependencies using npm:
 ```
+npm install
+``` 
 
-### 2. Geospatial Observation Data Table:
+NOTE: if u wanna use Nodemon then here's the [LINK](https://www.npmjs.com/package/nodemon)
 
+### 3. Set Up Environment Variables:
+Before starting the server, make sure to set up the necessary environment variables. Create a .env file in the root of your project directory and include all the necessary keys:
 ```
-CREATE TABLE observation_geospatial (
-    gbifID BIGINT PRIMARY KEY,
-    stateProvince VARCHAR(255),
-    locality VARCHAR(255),
-    decimalLatitude FLOAT,
-    decimalLongitude FLOAT,
-    FOREIGN KEY (gbifID) REFERENCES observation_temporal(gbifID)
-);
+ORACLE_DB_USER=username
+ORACLE_DB_PASSWORD=password
+ORACLE_DB_CONNECTION_STRING=connection_string
+``` 
+
+### 4. Start the Application:
+Run the application using Node.js. This command will start the server:
 ```
+node app.js
+``` 
+You should see a message indicating that the server is running, typically on http://localhost:3000.
 
-### 3. Detailed Bird Observations:
 
+### 5. Test API Endpoints:
+Open a web browser or use a tool like Postman to test the API endpoints. Here are the links you can use to access the different queries, assuming the server is running on localhost port 3000:
+
+1. Query 1 (Bird Observations and Climate Variations Correlation):
 ```
-CREATE TABLE bird_details (
-    gbifID BIGINT PRIMARY KEY,
-    scientificName VARCHAR(255),
-    iucnRedListCategory VARCHAR(50),
-    family VARCHAR(255),
-    genus VARCHAR(255),
-    FOREIGN KEY (gbifID) REFERENCES observation_temporal(gbifID)
-);
+http://localhost:3000/api/query1
+``` 
+
+2. Query 2 (Enhanced Diversity Index with Climate Data Integration):
 ```
+http://localhost:3000/api/query2
+``` 
 
-
-## II. Climate Data
-
-### 1. Precipitation Data Table:
-
+3. Query 3 (Year-over-Year Growth Rate in Species Observations):
 ```
-CREATE TABLE climate_precipitation (
-    year INT,
-    annual_precipitation_median FLOAT,
-    precipitation_p10 FLOAT,
-    precipitation_p90 FLOAT
-);
+http://localhost:3000/api/query3
+``` 
+
+4. Query 4 (Bird Population Dynamics Trends):
 ```
+http://localhost:3000/api/query4
+``` 
 
-### 2. Temperature Data Table:
-
+5. Query 5 (Regional Taxonomic Diversity and Conservation Priorities):
 ```
-CREATE TABLE climate_temperature (
-    year INT,
-    annual_temperature_median FLOAT,
-    temperature_p10 FLOAT,
-    temperature_p90 FLOAT
-);
-```
+http://localhost:3000/api/query5
+``` 
 
-
-### Current SQL Code:
-```
---GRANT SELECT,INSERT,UPDATE,DELETE ON observation_temporal TO "DORIAN.DEJESUS";
---GRANT SELECT,INSERT,UPDATE,DELETE ON observation_temporal TO JFLOTHE;
---GRANT SELECT,INSERT,UPDATE,DELETE ON observation_temporal TO NGLEASON;
---GRANT SELECT,INSERT,UPDATE,DELETE ON observation_temporal TO RCAPUNO;
---
---
---GRANT SELECT,INSERT,UPDATE,DELETE ON observation_geospatial TO "DORIAN.DEJESUS";
---GRANT SELECT,INSERT,UPDATE,DELETE ON observation_geospatial TO JFLOTHE;
---GRANT SELECT,INSERT,UPDATE,DELETE ON observation_geospatial TO NGLEASON;
---GRANT SELECT,INSERT,UPDATE,DELETE ON observation_geospatial TO RCAPUNO;
---
---
---
---GRANT SELECT,INSERT,UPDATE,DELETE ON bird_details TO "DORIAN.DEJESUS";
---GRANT SELECT,INSERT,UPDATE,DELETE ON bird_details TO JFLOTHE;
---GRANT SELECT,INSERT,UPDATE,DELETE ON bird_details TO NGLEASON;
---GRANT SELECT,INSERT,UPDATE,DELETE ON bird_details TO RCAPUNO;
---
---
---
---GRANT SELECT,INSERT,UPDATE,DELETE ON climate_precipitation TO "DORIAN.DEJESUS";
---GRANT SELECT,INSERT,UPDATE,DELETE ON climate_precipitation TO JFLOTHE;
---GRANT SELECT,INSERT,UPDATE,DELETE ON climate_precipitation TO NGLEASON;
---GRANT SELECT,INSERT,UPDATE,DELETE ON climate_precipitation TO RCAPUNO;
---
---
---GRANT SELECT,INSERT,UPDATE,DELETE ON climate_temperature TO "DORIAN.DEJESUS";
---GRANT SELECT,INSERT,UPDATE,DELETE ON climate_temperature TO JFLOTHE;
---GRANT SELECT,INSERT,UPDATE,DELETE ON climate_temperature TO NGLEASON;
---GRANT SELECT,INSERT,UPDATE,DELETE ON climate_temperature TO RCAPUNO;
-
-
----------- I. Observational Data
----- 1. Temporal Observation Data Table:
---CREATE TABLE observation_temporal (
---    gbifID NUMBER(19) PRIMARY KEY,
---    eventDate DATE,
---    year NUMBER(4),
---    month NUMBER(2),
---    day NUMBER(2),
---    stateProvince VARCHAR2(255)
---);
---
----- 2. Geospatial Observation Data Table:
---CREATE TABLE observation_geospatial (
---    gbifID NUMBER(19) PRIMARY KEY,
---    stateProvince VARCHAR2(255),
---    locality VARCHAR2(255),
---    decimalLatitude FLOAT,
---    decimalLongitude FLOAT,
---    FOREIGN KEY (gbifID) REFERENCES observation_temporal(gbifID)
---);
---
----- 3. Detailed Bird Observations:
---CREATE TABLE bird_details (
---    gbifID NUMBER(19) PRIMARY KEY,
---    scientificName VARCHAR2(255),
---    iucnRedListCategory VARCHAR2(50),
---    family VARCHAR2(255),
---    genus VARCHAR2(255),
---    FOREIGN KEY (gbifID) REFERENCES observation_temporal(gbifID)
---);
-
-
----------- II. Climate Data
----- 1. Precipitation Data Table:
---CREATE TABLE climate_precipitation (
---    year INT,
---    annual_precipitation_median FLOAT,
---    precipitation_p10 FLOAT,
---    precipitation_p90 FLOAT
---);
---
----- 2. Temperature Data Table:
---CREATE TABLE climate_temperature (
---    year INT,
---    annual_temperature_median FLOAT,
---    temperature_p10 FLOAT,
---    temperature_p90 FLOAT
---);
-
-
-SELECT * FROM observation_temporal;
-SELECT * FROM observation_geospatial;
-SELECT * FROM bird_details;
-SELECT * FROM climate_precipitation;
-SELECT * FROM climate_temperature;
-
-```

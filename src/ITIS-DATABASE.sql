@@ -1,33 +1,33 @@
-GRANT SELECT,INSERT,UPDATE,DELETE ON observation_temporal TO "DORIAN.DEJESUS";
-GRANT SELECT,INSERT,UPDATE,DELETE ON observation_temporal TO JFLOTHE;
-GRANT SELECT,INSERT,UPDATE,DELETE ON observation_temporal TO NGLEASON;
-GRANT SELECT,INSERT,UPDATE,DELETE ON observation_temporal TO RCAPUNO;
+-- GRANT SELECT,INSERT,UPDATE,DELETE ON observation_temporal TO "DORIAN.DEJESUS";
+-- GRANT SELECT,INSERT,UPDATE,DELETE ON observation_temporal TO JFLOTHE;
+-- GRANT SELECT,INSERT,UPDATE,DELETE ON observation_temporal TO NGLEASON;
+-- GRANT SELECT,INSERT,UPDATE,DELETE ON observation_temporal TO RCAPUNO;
 
 
-GRANT SELECT,INSERT,UPDATE,DELETE ON observation_geospatial TO "DORIAN.DEJESUS";
-GRANT SELECT,INSERT,UPDATE,DELETE ON observation_geospatial TO JFLOTHE;
-GRANT SELECT,INSERT,UPDATE,DELETE ON observation_geospatial TO NGLEASON;
-GRANT SELECT,INSERT,UPDATE,DELETE ON observation_geospatial TO RCAPUNO;
-
-
-
-GRANT SELECT,INSERT,UPDATE,DELETE ON bird_details TO "DORIAN.DEJESUS";
-GRANT SELECT,INSERT,UPDATE,DELETE ON bird_details TO JFLOTHE;
-GRANT SELECT,INSERT,UPDATE,DELETE ON bird_details TO NGLEASON;
-GRANT SELECT,INSERT,UPDATE,DELETE ON bird_details TO RCAPUNO;
+-- GRANT SELECT,INSERT,UPDATE,DELETE ON observation_geospatial TO "DORIAN.DEJESUS";
+-- GRANT SELECT,INSERT,UPDATE,DELETE ON observation_geospatial TO JFLOTHE;
+-- GRANT SELECT,INSERT,UPDATE,DELETE ON observation_geospatial TO NGLEASON;
+-- GRANT SELECT,INSERT,UPDATE,DELETE ON observation_geospatial TO RCAPUNO;
 
 
 
-GRANT SELECT,INSERT,UPDATE,DELETE ON climate_precipitation TO "DORIAN.DEJESUS";
-GRANT SELECT,INSERT,UPDATE,DELETE ON climate_precipitation TO JFLOTHE;
-GRANT SELECT,INSERT,UPDATE,DELETE ON climate_precipitation TO NGLEASON;
-GRANT SELECT,INSERT,UPDATE,DELETE ON climate_precipitation TO RCAPUNO;
+-- GRANT SELECT,INSERT,UPDATE,DELETE ON bird_details TO "DORIAN.DEJESUS";
+-- GRANT SELECT,INSERT,UPDATE,DELETE ON bird_details TO JFLOTHE;
+-- GRANT SELECT,INSERT,UPDATE,DELETE ON bird_details TO NGLEASON;
+-- GRANT SELECT,INSERT,UPDATE,DELETE ON bird_details TO RCAPUNO;
 
 
-GRANT SELECT,INSERT,UPDATE,DELETE ON climate_temperature TO "DORIAN.DEJESUS";
-GRANT SELECT,INSERT,UPDATE,DELETE ON climate_temperature TO JFLOTHE;
-GRANT SELECT,INSERT,UPDATE,DELETE ON climate_temperature TO NGLEASON;
-GRANT SELECT,INSERT,UPDATE,DELETE ON climate_temperature TO RCAPUNO;
+
+-- GRANT SELECT,INSERT,UPDATE,DELETE ON climate_precipitation TO "DORIAN.DEJESUS";
+-- GRANT SELECT,INSERT,UPDATE,DELETE ON climate_precipitation TO JFLOTHE;
+-- GRANT SELECT,INSERT,UPDATE,DELETE ON climate_precipitation TO NGLEASON;
+-- GRANT SELECT,INSERT,UPDATE,DELETE ON climate_precipitation TO RCAPUNO;
+
+
+-- GRANT SELECT,INSERT,UPDATE,DELETE ON climate_temperature TO "DORIAN.DEJESUS";
+-- GRANT SELECT,INSERT,UPDATE,DELETE ON climate_temperature TO JFLOTHE;
+-- GRANT SELECT,INSERT,UPDATE,DELETE ON climate_temperature TO NGLEASON;
+-- GRANT SELECT,INSERT,UPDATE,DELETE ON climate_temperature TO RCAPUNO;
 
 
 -------- I. Observational Data
@@ -146,46 +146,60 @@ ORDER BY
 
 
 
--- Adjusted Query 2 for dynamic input with example years provided:
+-- Adjusted Query 2 incorporating climate data for a more comprehensive analysis
 WITH yearly_data AS (
-   SELECT
-       ot.year,
-       bd.scientificName,
-       COUNT(*) AS observation_count
-   FROM
-       observation_temporal ot
-       JOIN bird_details bd ON ot.gbifID = bd.gbifID
-   WHERE
-       ot.year BETWEEN 2010 AND 2020  -- Example range: 2010 to 2020, change as needed
-   GROUP BY
-       ot.year, bd.scientificName
+    SELECT
+        ot.year,
+        bd.scientificName,
+        COUNT(*) AS observation_count
+    FROM
+        observation_temporal ot
+        JOIN bird_details bd ON ot.gbifID = bd.gbifID
+    WHERE
+        ot.year BETWEEN 2010 AND 2020  -- Analysis range: 2010 to 2020, customizable
+    GROUP BY
+        ot.year, bd.scientificName
 ),
 diversity_index AS (
-   SELECT
-       year,
-       COUNT(scientificName) AS species_count,
-       SUM(observation_count) AS total_observations,
-       SUM(observation_count * LN(observation_count)) AS sum_ln_observations
-   FROM
-       yearly_data
-   GROUP BY
-       year
+    SELECT
+        year,
+        COUNT(scientificName) AS species_count,
+        SUM(observation_count) AS total_observations,
+        SUM(observation_count * LN(observation_count)) AS sum_ln_observations
+    FROM
+        yearly_data
+    GROUP BY
+        year
 ),
 biodiversity_scores AS (
-   SELECT
-       year,
-       species_count,
-       EXP((sum_ln_observations / total_observations) - LN(total_observations / species_count)) AS biodiversity_index
-   FROM
-       diversity_index
+    SELECT
+        year,
+        species_count,
+        EXP((sum_ln_observations / total_observations) - LN(total_observations / species_count)) AS biodiversity_index
+    FROM
+        diversity_index
+),
+climate_data AS (
+    SELECT
+        p.year,
+        p.annual_precipitation_median AS precipitation_median,
+        t.annual_temperature_median AS temperature_median
+    FROM
+        climate_precipitation p
+    JOIN
+        climate_temperature t ON p.year = t.year
 )
 SELECT
-   year,
-   ROUND(biodiversity_index, 2) AS biodiversity_score
+    bs.year,
+    ROUND(bs.biodiversity_index, 2) AS biodiversity_score,
+    cd.precipitation_median,
+    cd.temperature_median
 FROM
-   biodiversity_scores
+    biodiversity_scores bs
+JOIN
+    climate_data cd ON bs.year = cd.year
 ORDER BY
-   year;  -- Results ordered by year, this can be changed to order by biodiversity_score if preferred
+    bs.year;  -- Ordered by year, additional sorting by biodiversity_score or climate factors possible
 
 
 
