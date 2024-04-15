@@ -1,7 +1,6 @@
-// app.js
-
 require('dotenv').config();
 const express = require('express');
+const cors = require('cors'); // Import CORS module
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -12,6 +11,7 @@ const { openConnection } = require('./config/database');
 const trendAPI = require('./src/api/trendAPI');
 
 // Middlewares
+app.use(cors()); // Use CORS
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
