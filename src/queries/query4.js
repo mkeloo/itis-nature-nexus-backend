@@ -19,9 +19,9 @@ async function getPopulationDynamics(
                     bd.iucnRedListCategory,
                     COUNT(*) AS observation_count
                 FROM
-                    observation_temporal ot
-                    JOIN observation_geospatial og ON ot.gbifID = og.gbifID
-                    JOIN bird_details bd ON ot.gbifID = bd.gbifID
+                mkeloo.observation_temporal ot
+                    JOIN mkeloo.observation_geospatial og ON ot.gbifID = og.gbifID
+                    JOIN mkeloo.bird_details bd ON ot.gbifID = bd.gbifID
                 WHERE
                     ot.year BETWEEN :startYear AND :endYear AND
                     (og.stateProvince = :stateProvince OR :stateProvince IS NULL)
@@ -79,7 +79,7 @@ async function getPopulationDynamics(
                 c.observation_count,
                 c.prev_year_count,
                 c.growth_rate,
-                d.iucnRedListCategory,
+                d.iucnRedListCategory, 
                 d.category_count
             FROM
                 annual_data a

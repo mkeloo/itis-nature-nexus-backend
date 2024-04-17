@@ -13,8 +13,8 @@ async function getBirdClimateCorrelation(stateProvince, startYear, endYear) {
                 COUNT(DISTINCT b.scientificName) AS species_count,
                 COUNT(*) AS observation_count
             FROM
-                observation_temporal o
-                JOIN bird_details b ON o.gbifID = b.gbifID
+                mkeloo.observation_temporal o
+                JOIN mkeloo.bird_details b ON o.gbifID = b.gbifID
             WHERE
                 (:stateProvince IS NULL OR o.stateProvince = :stateProvince) AND
                 EXTRACT(YEAR FROM o.eventDate) BETWEEN :startYear AND :endYear
@@ -27,8 +27,8 @@ async function getBirdClimateCorrelation(stateProvince, startYear, endYear) {
                 p.annual_precipitation_median AS precipitation,
                 t.annual_temperature_median AS avg_temperature
             FROM
-                climate_precipitation p
-                JOIN climate_temperature t ON p.year = t.year
+              mkeloo.climate_precipitation p
+                JOIN mkeloo.climate_temperature t ON p.year = t.year
             WHERE
                 p.year BETWEEN :startYear AND :endYear
         ),

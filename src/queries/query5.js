@@ -19,8 +19,8 @@ async function getRegionalTaxonomicDiversity(
                 COUNT(DISTINCT bd.scientificName) AS NumberOfSpecies,
                 COUNT(DISTINCT CASE WHEN bd.iucnRedListCategory IN ('VU', 'EN', 'CR') THEN bd.scientificName END) AS ThreatenedSpecies
             FROM
-                observation_geospatial og
-                JOIN bird_details bd ON og.gbifID = bd.gbifID
+            mkeloo.observation_geospatial og
+                JOIN mkeloo.bird_details bd ON og.gbifID = bd.gbifID
             WHERE
                 (:stateProvince IS NULL OR og.stateProvince = :stateProvince) AND
                 (:family IS NULL OR bd.family = :family) AND

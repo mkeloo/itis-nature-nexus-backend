@@ -17,8 +17,8 @@ async function getDynamicGrowthRates(
                     ot.year,
                     COUNT(*) AS observation_count
                 FROM
-                    observation_temporal ot
-                    JOIN bird_details bd ON ot.gbifID = bd.gbifID
+                    mkeloo.observation_temporal ot
+                    JOIN mkeloo.bird_details bd ON ot.gbifID = bd.gbifID
                 WHERE
                     ot.year BETWEEN :startYear AND :endYear
                 GROUP BY
