@@ -2,6 +2,7 @@
 
 Google Doc For 5 Complex Queries: [LINK:](https://docs.google.com/document/d/1C_6i9Mzdmzy1009HQfd19PyyQo_rHkEit9O_QogxLaE/edit?usp=sharing)
 
+## ensure to include <username.>TABLE_NAME for queries
 
 ## Steps to test the backend App:
 
