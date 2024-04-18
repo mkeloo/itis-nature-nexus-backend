@@ -71,9 +71,9 @@ router.get('/query3', async (req, res) => {
 router.get('/query4', async (req, res) => {
   try {
     // Extracting parameters from the query string and providing defaults if not specified
-    const startYear = parseInt(req.query.startYear) || 2000; // Default start year if not provided
+    const startYear = parseInt(req.query.startYear) || 2015; // Default start year if not provided
     const endYear = parseInt(req.query.endYear) || new Date().getFullYear(); // Default to current year if not provided
-    const stateProvince = req.query.stateProvince || 'Tirol'; // Default to 'Tirol' if not provided
+    const stateProvince = req.query.stateProvince; // Default to 'Tirol' if not provided
     const orderBy = req.query.orderBy || 'year ASC'; // Default sorting by year ascending if not provided
 
     // Calling the modified function with parameters
