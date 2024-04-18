@@ -1,6 +1,7 @@
 # itis-nature-nexus-backend
 
 Google Doc For 5 Complex Queries: [LINK:](https://docs.google.com/document/d/1C_6i9Mzdmzy1009HQfd19PyyQo_rHkEit9O_QogxLaE/edit?usp=sharing)
+## DO NOT MERGE WITH MAIN SINCE TABLES NAMES ARE PREPENDED -- THIS BRANCH IS FOR REFERENCE ONLY
 
 ## ensure to include <username.>TABLE_NAME for queries
 
