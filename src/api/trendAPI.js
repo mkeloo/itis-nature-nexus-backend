@@ -63,10 +63,10 @@ router.get('/query3', async (req, res) => {
 // QUERY 4: Endpoint for bird population dynamics trends with dynamic parameters
 router.get('/query4', async (req, res) => {
   try {
-    const startYear = parseInt(req.query.startYear) || 2015;
+    const startYear = parseInt(req.query.startYear) || 2019;
     const endYear = parseInt(req.query.endYear) || new Date().getFullYear();
     const stateProvince = req.query.stateProvince;
-    const orderBy = req.query.orderBy || 'year ASC';
+    const orderBy = req.query.orderBy || 'observation_count DESC';
 
     const data = await getPopulationDynamics(
       startYear,
