@@ -9,7 +9,7 @@ async function getRegionalTaxonomicDiversity(
 ) {
   let connection;
   try {
-    connection = await openConnection(); // Consistent connection handling
+    connection = await openConnection();
     const sql = `
         WITH RegionTaxonomy AS (
             SELECT
