@@ -99,8 +99,8 @@ WITH bird_observations_summary AS (
        observation_temporal o
        JOIN bird_details b ON o.gbifID = b.gbifID
    WHERE
-       (o.stateProvince = 'Tirol' OR o.stateProvince IS NULL)  -- User can specify like "Tirol" here or leave null for all provinces
-       AND EXTRACT(YEAR FROM o.eventDate) BETWEEN 2010 AND 2020  -- Dynamic range, can be changed as needed
+       (o.stateProvince = 'Tirol' OR o.stateProvince IS NULL)  --  stateProvince or include all if NULL
+       AND EXTRACT(YEAR FROM o.eventDate) BETWEEN 2010 AND 2020  -- dynamic range, can be changed as needed
    GROUP BY
        o.stateProvince, EXTRACT(YEAR FROM o.eventDate)
 ),
@@ -113,7 +113,7 @@ climate_summary AS (
        climate_precipitation p
        JOIN climate_temperature t ON p.year = t.year
    WHERE
-       p.year BETWEEN 2010 AND 2020  -- Matching the observation year range
+       p.year BETWEEN 2010 AND 2020  -- matching the observation year range
 ),
 combined_analysis AS (
    SELECT
@@ -142,11 +142,11 @@ SELECT
 FROM
    combined_analysis ca
 ORDER BY
-   ca.year, ca.stateProvince;  -- Ordering by year and stateProvince, customizable
+   ca.year, ca.stateProvince;  
 
 
 
--- Adjusted Query 2 incorporating climate data for a more comprehensive analysis
+-- Adjusted Query 2 incorporating climate data 
 WITH yearly_data AS (
     SELECT
         ot.year,
@@ -156,7 +156,7 @@ WITH yearly_data AS (
         observation_temporal ot
         JOIN bird_details bd ON ot.gbifID = bd.gbifID
     WHERE
-        ot.year BETWEEN 2010 AND 2020  -- Analysis range: 2010 to 2020, customizable
+        ot.year BETWEEN 2010 AND 2020  
     GROUP BY
         ot.year, bd.scientificName
 ),
@@ -199,7 +199,7 @@ FROM
 JOIN
     climate_data cd ON bs.year = cd.year
 ORDER BY
-    bs.year;  -- Ordered by year, additional sorting by biodiversity_score or climate factors possible
+    bs.year;  
 
 
 
@@ -213,7 +213,7 @@ WITH yearly_observations AS (
        observation_temporal ot
        JOIN bird_details bd ON ot.gbifID = bd.gbifID
    WHERE
-       ot.year BETWEEN 2010 AND 2020  -- Analysis range is currently set from 2010 to 2020, change as needed
+       ot.year BETWEEN 2010 AND 2020  
    GROUP BY
        bd.scientificName, ot.year
 ),
@@ -238,7 +238,7 @@ significant_changes AS (
    FROM
        growth_rates
    WHERE
-       ABS(growth_rate) >= 0.5  -- Filtering to show only significant changes: 50% increase or decrease
+       ABS(growth_rate) >= 0.5  
 )
 SELECT
    scientificName,
@@ -249,7 +249,7 @@ SELECT
 FROM
    significant_changes
 ORDER BY
-   growth_rate_percentage DESC, scientificName, year;  -- Ordering by most significant changes first
+   growth_rate_percentage DESC, scientificName, year;  
 
 
 -- Adjusted Query 4 for dynamic input with example values:
@@ -265,8 +265,8 @@ WITH annual_data AS (
        JOIN observation_geospatial og ON ot.gbifID = og.gbifID
        JOIN bird_details bd ON ot.gbifID = bd.gbifID
    WHERE
-       ot.year BETWEEN 2010 AND 2020  -- Example range: 2010 to 2020, can be changed as needed
-       AND (og.stateProvince = 'Burgenland' OR og.stateProvince IS NULL)  -- User can specify like "Burgenland" here to Filter by stateProvince or include all
+       ot.year BETWEEN 2010 AND 2020  
+       AND (og.stateProvince = 'Burgenland' OR og.stateProvince IS NULL)  
    GROUP BY
        og.stateProvince,
        ot.year,
@@ -329,10 +329,10 @@ FROM
    JOIN growth_rates c ON a.stateProvince = c.stateProvince AND a.year = c.year
    JOIN conservation_trends d ON a.stateProvince = d.stateProvince AND a.year = d.year AND d.rank = 1
 ORDER BY
-   b.biodiversity_index DESC, a.year, a.stateProvince;  -- Order can be adjusted to focus on different aspects
+   b.biodiversity_index DESC, a.year, a.stateProvince;  
 
 
--- Adjusted Query 5 for dynamic input with example values:
+-- Adjusted Query 5 for dynamic input 
 WITH RegionTaxonomy AS (
    SELECT
        og.stateProvince,
@@ -344,9 +344,9 @@ WITH RegionTaxonomy AS (
        observation_geospatial og
        JOIN bird_details bd ON og.gbifID = bd.gbifID
    WHERE
-       (og.stateProvince = 'Tirol' OR og.stateProvince IS NULL)  -- Example stateProvince or include all if NULL
-       AND (bd.family = 'Accipitridae' OR bd.family IS NULL)  -- Example family or include all if NULL
-       AND (bd.genus = 'Aquila' OR bd.genus IS NULL)  -- Example genus or include all if NULL
+       (og.stateProvince = 'Tirol' OR og.stateProvince IS NULL)  
+       AND (bd.family = 'Accipitridae' OR bd.family IS NULL)  
+       AND (bd.genus = 'Aquila' OR bd.genus IS NULL)  
    GROUP BY
        og.stateProvince, bd.family, bd.genus
 ),
@@ -371,13 +371,13 @@ SELECT
 FROM
    ConservationFocus
 ORDER BY
-   ThreatenedPercentage DESC, ThreatenedSpecies DESC;  -- Order by highest percentage of threatened species, customizable
+   ThreatenedPercentage DESC, ThreatenedSpecies DESC;  
    
     
     
     
 
--- Adjusted Query 5 for dynamic input with example values and fetching multiple stateProvinces:
+-- Adjusted Query 5 for dynamic input 
 WITH RegionTaxonomy AS (
    SELECT
        og.stateProvince,
@@ -389,7 +389,7 @@ WITH RegionTaxonomy AS (
        observation_geospatial og
        JOIN bird_details bd ON og.gbifID = bd.gbifID
    WHERE
-       og.stateProvince IN ('Tirol', 'Wien', 'Niederösterreich', 'Kärnten', 'Salzburg')  -- Specify multiple regions as examples
+       og.stateProvince IN ('Tirol', 'Wien', 'Niederösterreich', 'Kärnten', 'Salzburg')  
    GROUP BY
        og.stateProvince, bd.family, bd.genus
 ),
@@ -414,4 +414,4 @@ SELECT
 FROM
    ConservationFocus
 ORDER BY
-   ThreatenedPercentage DESC, stateProvince, family, genus;  -- Order can be customized based on user needs
+   ThreatenedPercentage DESC, stateProvince, family, genus; 

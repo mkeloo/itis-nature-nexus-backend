@@ -29,7 +29,7 @@ router.get('/query1', async (req, res) => {
 // QUERY 2: Endpoint for biodiversity index trends with dynamic parameters
 router.get('/query2', async (req, res) => {
   try {
-    const startYear = parseInt(req.query.startYear) || 2000;
+    const startYear = parseInt(req.query.startYear) || 1950;
     const endYear = parseInt(req.query.endYear) || new Date().getFullYear();
 
     const data = await getDiversityIndex(startYear, endYear);
